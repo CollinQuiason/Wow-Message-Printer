@@ -19,31 +19,16 @@ def fullMessage(phrase):
 	for i in phrase.lower():
 		message(letters[i])
 def message(letter):
-	time.sleep(enterinterval)
-	keyboard.press(Key.enter)
-	time.sleep(enterinterval)
-	keyboard.release(Key.enter)
-	time.sleep(enterinterval)
+	enterKey()
 	for (index, pixel) in enumerate(letter):
 		if index % 5 == 0:
-			time.sleep(enterinterval)
-			keyboard.press(Key.enter)
-			time.sleep(enterinterval)
-			keyboard.release(Key.enter)
-			time.sleep(enterinterval)
-			keyboard.press(Key.enter)
-			time.sleep(enterinterval)
-			keyboard.release(Key.enter)
-			time.sleep(enterinterval)
+			enterKey()
+			enterKey()
 		if pixel == '0':
 			cross()
 		else:
 			square()
-	time.sleep(enterinterval)		
-	keyboard.press(Key.enter)
-	time.sleep(enterinterval)
-	keyboard.release(Key.enter)
-	time.sleep(enterinterval)
+	enterKey()
 	space()
 
 def on_press(key):
@@ -60,7 +45,14 @@ def on_release(key):
     try:
         current.remove(key)
     except KeyError:
-        pass	
+        pass
+        
+def enterKey():
+	keyboard.press(Key.enter)
+	time.sleep(enterinterval)
+	keyboard.release(Key.enter)
+	time.sleep(enterinterval)
+
 def square():
 	time.sleep(interval)
 	keyboard.press(Key.shift)
