@@ -4,20 +4,36 @@ import time
 keyboard = Controller()
 
 # The key combination to check
-COMBINATION = {Key.ctrl_r, Key.f2}
+COMBINATION = {Key.f1, Key.f2}
 
 # The currently active modifiers
 current = set()
+global messageString
+messageString = ""
 enterinterval = 0.006
 interval = 0.002
+
+#Triggers
+global recordMessage
+recordMessage = False
+global commit
+commit = False
 
 
 def main():
 	with Listener(on_press=on_press, on_release=on_release) as listener:
 		listener.join()
-def fullMessage(phrase):
-	for i in phrase.lower():
+
+def commitMessage():
+	global commit
+	commit = True
+	global messageString
+	print messageString
+	for i in messageString.lower():
 		message(letters[i])
+	messageString = ""
+	commit = False
+
 def message(letter):
 	enterKey()
 	for (index, pixel) in enumerate(letter):
@@ -32,21 +48,27 @@ def message(letter):
 	space()
 
 def on_press(key):
+    global recordMessage
+    global messageString
     if key in COMBINATION:
         current.add(key)
         if all(k in current for k in COMBINATION):
-            fullMessage('test');
-
-    if key == Key.esc or key == '`':
+            recordMessage = True
+    elif key == Key.esc or key == '`':
         listener.stop()
         raise StopIteration
+    elif recordMessage == True and commit == False:
+		print str(key)
+		messageString += str(key)[2:3]
 
 def on_release(key):
     try:
         current.remove(key)
     except KeyError:
         pass
-        
+    if key in COMBINATION and (not all(k in current for k in COMBINATION)):
+    	commitMessage()
+
 def enterKey():
 	keyboard.press(Key.enter)
 	time.sleep(enterinterval)
