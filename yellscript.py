@@ -4,7 +4,8 @@ import time
 keyboard = Controller()
 
 # The key combination to check
-COMBINATION = {Key.f1, Key.f2}
+GUICOMBINATION = {Key.ctrl_r, Key.f4}
+COMBINATION = {Key.f4}
 
 # The currently active modifiers
 current = set()
@@ -25,10 +26,12 @@ def main():
 		listener.join()
 
 def commitMessage():
+	global recordMessage
+	recordMessage = False
 	global commit
 	commit = True
 	global messageString
-	print messageString
+	print str("Message Sending... + \"" messageString + "\"")
 	for i in messageString.lower():
 		message(letters[i])
 	messageString = ""
@@ -50,15 +53,18 @@ def message(letter):
 def on_press(key):
     global recordMessage
     global messageString
+    current.add(key)
     if key in COMBINATION:
-        current.add(key)
-        if all(k in current for k in COMBINATION):
+        if all(k in current for k in COMBINATION): #Record Message
             recordMessage = True
-    elif key == Key.esc or key == '`':
+    if key in GUICOMBINATION:
+    	if all(k in current for k in GUICOMBINATION): #GUI Appear
+
+    elif key == Key.esc or key == '`': #Stop
         listener.stop()
         raise StopIteration
-    elif recordMessage == True and commit == False:
-		print str(key)
+    elif recordMessage == True and commit == False: #Add key to message record
+		print str("Key added to message: " + key)
 		messageString += str(key)[2:3]
 
 def on_release(key):
