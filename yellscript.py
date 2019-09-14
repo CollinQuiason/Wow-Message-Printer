@@ -25,30 +25,13 @@ def main():
 	with Listener(on_press=on_press, on_release=on_release) as listener:
 		listener.join()
 
-def commitMessage():
-	global recordMessage
-	recordMessage = False
-	global commit
-	commit = True
-	global messageString
-	print str("Message Sending... + \"" messageString + "\"")
-	for i in messageString.lower():
-		message(letters[i])
-	messageString = ""
-	commit = False
 
-def message(letter):
-	enterKey()
-	for (index, pixel) in enumerate(letter):
-		if index % 5 == 0:
-			enterKey()
-			enterKey()
-		if pixel == '0':
-			cross()
-		else:
-			square()
-	enterKey()
-	space()
+
+
+
+
+
+
 
 def on_press(key):
     global recordMessage
@@ -74,6 +57,34 @@ def on_release(key):
         pass
     if key in COMBINATION and (not all(k in current for k in COMBINATION)):
     	commitMessage()
+
+
+def commitMessage():
+	global recordMessage
+	recordMessage = False
+	global commit
+	commit = True
+	global messageString
+	print str("Message Sending... + \"" messageString + "\"")
+	for i in messageString.lower():
+		message(letters[i])
+	messageString = ""
+	commit = False
+
+def message(letter):
+	enterKey()
+	for (index, pixel) in enumerate(letter):
+		if index % 5 == 0:
+			enterKey()
+			enterKey()
+		if pixel == '0':
+			cross()
+		else:
+			square()
+	enterKey()
+	space()
+
+
 
 def enterKey():
 	keyboard.press(Key.enter)
