@@ -27,18 +27,9 @@ global commitDiscord
 commit = False
 commitDiscord = False
 
-
 def main():
 	with Listener(on_press=on_press, on_release=on_release) as listener:
 		listener.join()
-
-
-
-
-
-
-
-
 
 def on_press(key):
 	global recordMessage
@@ -75,7 +66,6 @@ def on_release(key):
 		commitMessage()
 	if key in DISCORDCOMBINATION and (not all(k in current for k in DISCORDCOMBINATION)):
 		commitDiscordMessage()
-
 
 def commitMessage():
 	global recordMessage
@@ -116,7 +106,6 @@ def message(letter):
 	space()
 
 def messageDiscord(letter):
-
 	spaceDiscord()
 	enterKey()
 	for (index, pixel) in enumerate(letter):
@@ -130,10 +119,6 @@ def messageDiscord(letter):
 	enterKey()
 
 def typeMessage(message):
-	# for letter in message:
-	# 	if letter == ':':
-	# 		letter = Key.colon
-	# 	pressKey("\'" + letter + "\'")
 	keyboard.type(message)
 
 def pressKey(key):
@@ -141,7 +126,6 @@ def pressKey(key):
 	time.sleep(interval)
 	keyboard.release(key)
 	time.sleep(interval)
-
 
 def enterKey():
 	keyboard.press(Key.enter)
@@ -197,6 +181,7 @@ def square():
 	time.sleep(interval)
 	keyboard.release(Key.shift)
 	time.sleep(interval)
+	
 def space():
 	time.sleep(enterinterval)		
 	keyboard.press(Key.enter)
@@ -241,6 +226,7 @@ def space():
 	time.sleep(enterinterval)
 def spaceDiscord():
 	typeMessage(":space_invader:")
+
 def cross():
 	time.sleep(interval)
 	keyboard.press(Key.shift)
