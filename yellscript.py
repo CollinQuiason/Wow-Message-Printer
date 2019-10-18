@@ -4,7 +4,7 @@ import time
 keyboard = Controller()
 
 # The key combination to check
-GUICOMBINATION = {Key.ctrl_r, Key.f4}
+GUICOMBINATION = {Key.ctrl_r, Key.f7}
 COMBINATION = {Key.f10}
 DISCORDCOMBINATION = {Key.f4}
 
@@ -59,10 +59,10 @@ def on_press(key):
 	elif key == Key.esc or key == '`': #Stop
 		listener.stop()
 		raise StopIteration
-	elif recordMessage == True and commit == False: #Add key to message record
+	elif recordMessage == True and commit == False and all(k in current for k in COMBINATION): #Add key to message record
 		print ("Key added to wow message: " + str(key))
 		messageString += str(key)[1:-1]
-	elif recordDiscordMessage == True and commitDiscord == False:
+	elif recordDiscordMessage == True and commitDiscord == False and all(k in current for k in DISCORDCOMBINATION):
 		print ("Key added to disord message: " + str(key))
 		messageStringDiscord += str(key)[1:-1]
 
@@ -116,6 +116,7 @@ def message(letter):
 	space()
 
 def messageDiscord(letter):
+	spaceDiscord()
 	enterKey()
 	for (index, pixel) in enumerate(letter):
 		if index % 5 == 0:
@@ -126,7 +127,6 @@ def messageDiscord(letter):
 		else:
 			cool()
 	enterKey()
-	spaceDiscord()
 
 def typeMessage(message):
 	# for letter in message:
