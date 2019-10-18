@@ -4,7 +4,7 @@ import time
 keyboard = Controller()
 
 # The key combination to check
-GUICOMBINATION = {Key.ctrl_r, Key.f7}
+GUICOMBINATION = {Key.ctrl_r, Key.f4}
 COMBINATION = {Key.f10}
 DISCORDCOMBINATION = {Key.f4}
 
@@ -116,6 +116,7 @@ def message(letter):
 	space()
 
 def messageDiscord(letter):
+	
 	spaceDiscord()
 	enterKey()
 	for (index, pixel) in enumerate(letter):
