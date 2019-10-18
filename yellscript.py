@@ -5,20 +5,27 @@ keyboard = Controller()
 
 # The key combination to check
 GUICOMBINATION = {Key.ctrl_r, Key.f4}
-COMBINATION = {Key.f4}
+COMBINATION = {Key.f10}
+DISCORDCOMBINATION = {Key.f4}
 
 # The currently active modifiers
 current = set()
 global messageString
+global messageStringDiscord
 messageString = ""
+messageStringDiscord = ""
 enterinterval = 0.006
 interval = 0.002
 
 #Triggers
 global recordMessage
+global recordDiscordMessage
 recordMessage = False
+recordDiscordMessage = False
 global commit
+global commitDiscord
 commit = False
+commitDiscord = False
 
 
 def main():
@@ -34,29 +41,40 @@ def main():
 
 
 def on_press(key):
-    global recordMessage
-    global messageString
-    current.add(key)
-    if key in COMBINATION:
-        if all(k in current for k in COMBINATION): #Record Message
-            recordMessage = True
-    if key in GUICOMBINATION:
-    	if all(k in current for k in GUICOMBINATION): #GUI Appear
+	global recordMessage
+	global messageString
+	global recordDiscordMessage
+	global messageStringDiscord
+	current.add(key)
+	if key in COMBINATION:
+		if all(k in current for k in COMBINATION): #Record Message
+			recordMessage = True
+	if key in DISCORDCOMBINATION:
+		if all(k in current for k in DISCORDCOMBINATION): #Record Message
+			recordDiscordMessage = True
+	if key in GUICOMBINATION:
+		if all(k in current for k in GUICOMBINATION): #GUI Appear
+			dosomething()
 
-    elif key == Key.esc or key == '`': #Stop
-        listener.stop()
-        raise StopIteration
-    elif recordMessage == True and commit == False: #Add key to message record
-		print str("Key added to message: " + key)
-		messageString += str(key)[2:3]
+	elif key == Key.esc or key == '`': #Stop
+		listener.stop()
+		raise StopIteration
+	elif recordMessage == True and commit == False: #Add key to message record
+		print ("Key added to wow message: " + str(key))
+		messageString += str(key)[1:-1]
+	elif recordDiscordMessage == True and commitDiscord == False:
+		print ("Key added to disord message: " + str(key))
+		messageStringDiscord += str(key)[1:-1]
 
 def on_release(key):
-    try:
-        current.remove(key)
-    except KeyError:
-        pass
-    if key in COMBINATION and (not all(k in current for k in COMBINATION)):
-    	commitMessage()
+	try:
+		current.remove(key)
+	except KeyError:
+		pass
+	if key in COMBINATION and (not all(k in current for k in COMBINATION)):
+		commitMessage()
+	if key in DISCORDCOMBINATION and (not all(k in current for k in DISCORDCOMBINATION)):
+		commitDiscordMessage()
 
 
 def commitMessage():
@@ -65,11 +83,24 @@ def commitMessage():
 	global commit
 	commit = True
 	global messageString
-	print str("Message Sending... + \"" messageString + "\"")
+	print ("Wow Message Sending... \"" + messageString + "\"")
 	for i in messageString.lower():
 		message(letters[i])
 	messageString = ""
 	commit = False
+
+
+def commitDiscordMessage():
+	global recordDiscordMessage
+	recordMessage = False
+	global commitDiscord
+	commit = True
+	global messageStringDiscord
+	print ("Discord Message Sending... \"" + messageStringDiscord + "\"")
+	for i in messageStringDiscord.lower():
+		messageDiscord(letters[i])
+	messageStringDiscord = ""
+	commitDiscord = False
 
 def message(letter):
 	enterKey()
@@ -84,6 +115,31 @@ def message(letter):
 	enterKey()
 	space()
 
+def messageDiscord(letter):
+	enterKey()
+	for (index, pixel) in enumerate(letter):
+		if index % 5 == 0:
+			enterKey()
+			enterKey()
+		if pixel == '0':
+			hunnet()
+		else:
+			cool()
+	enterKey()
+	spaceDiscord()
+
+def typeMessage(message):
+	# for letter in message:
+	# 	if letter == ':':
+	# 		letter = Key.colon
+	# 	pressKey("\'" + letter + "\'")
+	keyboard.type(message)
+
+def pressKey(key):
+	keyboard.press(key)
+	time.sleep(interval)
+	keyboard.release(key)
+	time.sleep(interval)
 
 
 def enterKey():
@@ -91,6 +147,12 @@ def enterKey():
 	time.sleep(enterinterval)
 	keyboard.release(Key.enter)
 	time.sleep(enterinterval)
+
+def hunnet():
+	typeMessage(":100:")
+
+def cool():
+	typeMessage(":cool:")
 
 def square():
 	time.sleep(interval)
@@ -176,6 +238,8 @@ def space():
 	time.sleep(enterinterval)
 	keyboard.release(Key.enter)
 	time.sleep(enterinterval)
+def spaceDiscord():
+	typeMessage(":space_invader:")
 def cross():
 	time.sleep(interval)
 	keyboard.press(Key.shift)
@@ -371,7 +435,19 @@ letters = {
 		"00010" +
 		"00100" +
 		"01000" +
-		"11111"
+		"11111",
+
+	"0":"11111" +
+		"10011" +
+		"10101" +
+		"11001" +
+		"11111",
+
+	"1":"01100" +
+		"00100" +
+		"00100" +
+		"00100" +
+		"01110",
 }
 
 
