@@ -1,12 +1,14 @@
-from pynput.keyboard import Key, Controller, Listener
+from pynput.keyboard import Key, Controller, Listener, KeyCode
 import time
 #Data
 keyboard = Controller()
 
 # The key combination to check
 GUICOMBINATION = {Key.ctrl_r, Key.f4}
-COMBINATION = {Key.f10}
-DISCORDCOMBINATION = {Key.f3}
+COMBINATION = {Key.shift_r}
+DISCORDCOMBINATION = {Key.alt_r}
+TP_RAIDO_COMBINATION = {KeyCode.from_char('#')}
+STOP_COMBINATION = {Key.shift, Key.esc}
 
 # The currently active modifiers
 current = set()
@@ -23,7 +25,7 @@ global recordDiscordMessage
 recordMessage = False
 recordDiscordMessage = False
 global commit
-global commitDiscord
+global commitDiscordR
 commit = False
 commitDiscord = False
 
@@ -46,16 +48,26 @@ def on_press(key):
 	if key in GUICOMBINATION:
 		if all(k in current for k in GUICOMBINATION): #GUI Appear
 			dosomething()
+	if key in TP_RAIDO_COMBINATION:
+		if all (k in current for k in TP_RAIDO_COMBINATION):
+			tpRaido()
 
-	elif key == Key.esc or key == '`': #Stop
-		listener.stop()
-		raise StopIteration
+	elif key in STOP_COMBINATION:
+		if all (k in current for k in STOP_COMBINATION):
+			listener.stop()
+			raise StopIteration
 	elif recordMessage == True and commit == False and all(k in current for k in COMBINATION) and (key not in COMBINATION): #Add key to message record
 		print ("Key added to wow message: " + str(key))
 		messageString += str(key)[1:-1]
 	elif recordDiscordMessage == True and commitDiscord == False and all(k in current for k in DISCORDCOMBINATION) and (key not in DISCORDCOMBINATION):
 		print ("Key added to disord message: " + str(key))
 		messageStringDiscord += str(key)[1:-1]
+
+def registerKeybind(combination, actionFunction):
+	if key in combination:
+		if all (k in current for k in combination):
+			actionFunction()
+
 
 def on_release(key):
 	try:
@@ -105,6 +117,24 @@ def message(letter):
 	enterKey()
 	space()
 
+def tpRaido():
+	keyboard.release(Key.shift)
+	print('tpRaido....')
+	time.sleep(.01)
+	enterKey()
+	time.sleep(.01)
+	pressKey(Key.backspace)
+	time.sleep(.01)
+	pressKey(Key.backspace)
+	time.sleep(.01)
+	pressKey(Key.backspace)
+	time.sleep(.01)
+	time.sleep(interval)
+	typeMessageWithInterval("/tp Raido")
+	time.sleep(.01)
+	time.sleep(interval)
+	enterKey()
+
 def messageDiscord(letter):
 	spaceDiscord()
 	enterKey()
@@ -120,6 +150,11 @@ def messageDiscord(letter):
 
 def typeMessage(message):
 	keyboard.type(message)
+
+def typeMessageWithInterval(message):
+	time.sleep(interval)
+	for char in message: 
+		pressKey(KeyCode.from_char(char))
 
 def pressKey(key):
 	keyboard.press(key)
