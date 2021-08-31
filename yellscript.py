@@ -2,28 +2,42 @@ from pynput.keyboard import Key, Controller, Listener, KeyCode
 import time
 #Data
 keyboard = Controller()
+global MAC_ENVIRONMENT
+global WINDOWS_ENVIRONMENT
 
+#################
+##CONFIGURATION##
+#################
+MAC_ENVIRONMENT = True
+WINDOWS_ENVIRONMENT = False
 # The key combination to check
+STOP_COMBINATION = {Key.shift, Key.esc}
+#WINDOWS_ENVIRONMENT
 GUICOMBINATION = {Key.ctrl_r, Key.f4}
 COMBINATION = {Key.shift_r}
 DISCORDCOMBINATION = {Key.alt_r}
 TP_RAIDO_COMBINATION = {KeyCode.from_char('#')}
-STOP_COMBINATION = {Key.shift, Key.esc}
+#MAC_ENVIRONMENT
+START_ADVANCED_COMBINATION = {Key.alt_r}
 
 # The currently active modifiers
 current = set()
 global messageString
 global messageStringDiscord
+global advancedCommandString
 messageString = ""
 messageStringDiscord = ""
+advancedCommandString = ""
 enterinterval = 0.006
 interval = 0.002
 
 #Triggers
 global recordMessage
 global recordDiscordMessage
+global recordAdvancedMessage
 recordMessage = False
 recordDiscordMessage = False
+recordAdvancedMessage = False
 global commit
 global commitDiscordR
 commit = False
@@ -34,34 +48,49 @@ def main():
 		listener.join()
 
 def on_press(key):
-	global recordMessage
-	global messageString
-	global recordDiscordMessage
-	global messageStringDiscord
+	global MAC_ENVIRONMENT
+	global WINDOWS_ENVIRONMENT
 	current.add(key)
-	if key in COMBINATION:
-		if all(k in current for k in COMBINATION): #Record Message
-			recordMessage = True
-	if key in DISCORDCOMBINATION:
-		if all(k in current for k in DISCORDCOMBINATION): #Record Message
-			recordDiscordMessage = True
-	if key in GUICOMBINATION:
-		if all(k in current for k in GUICOMBINATION): #GUI Appear
-			dosomething()
-	if key in TP_RAIDO_COMBINATION:
-		if all (k in current for k in TP_RAIDO_COMBINATION):
-			tpRaido()
 
-	elif key in STOP_COMBINATION:
+	if (MAC_ENVIRONMENT):
+		global recordAdvancedMessage
+		global advancedCommandString
+		if key in START_ADVANCED_COMBINATION:
+			if all(k in current for k in START_ADVANCED_COMBINATION):
+				print ("RECORD ADVANED MESSAGE ENABLED")
+				recordAdvancedMessage = True;
+		elif recordAdvancedMessage == True and commitCommand == False and all(k in current for k in START_ADVANCED_COMBINATION) and (key not in START_ADVANCED_COMBINATION): #Add key to message record
+			print ("Key added to advanced command: " + str(key))
+			advancedCommandString += str(key)[1:-1]
+
+	elif (WINDOWS_ENVIRONMENT):
+		global recordMessage
+		global messageString
+		global recordDiscordMessage
+		global messageStringDiscord
+		if key in COMBINATION:
+			if all(k in current for k in COMBINATION): #Record Message
+				recordMessage = True
+		if key in DISCORDCOMBINATION:
+			if all(k in current for k in DISCORDCOMBINATION): #Record Message
+				recordDiscordMessage = True
+		if key in GUICOMBINATION:
+			if all(k in current for k in GUICOMBINATION): #GUI Appear
+				dosomething()
+		if key in TP_RAIDO_COMBINATION:
+			if all (k in current for k in TP_RAIDO_COMBINATION):
+				tpRaido()
+		elif recordMessage == True and commit == False and all(k in current for k in COMBINATION) and (key not in COMBINATION): #Add key to message record
+			print ("Key added to wow message: " + str(key))
+			messageString += str(key)[1:-1]
+		elif recordDiscordMessage == True and commitDiscord == False and all(k in current for k in DISCORDCOMBINATION) and (key not in DISCORDCOMBINATION):
+			print ("Key added to disord message: " + str(key))
+			messageStringDiscord += str(key)[1:-1]
+
+	if key in STOP_COMBINATION:
 		if all (k in current for k in STOP_COMBINATION):
 			listener.stop()
 			raise StopIteration
-	elif recordMessage == True and commit == False and all(k in current for k in COMBINATION) and (key not in COMBINATION): #Add key to message record
-		print ("Key added to wow message: " + str(key))
-		messageString += str(key)[1:-1]
-	elif recordDiscordMessage == True and commitDiscord == False and all(k in current for k in DISCORDCOMBINATION) and (key not in DISCORDCOMBINATION):
-		print ("Key added to disord message: " + str(key))
-		messageStringDiscord += str(key)[1:-1]
 
 def registerKeybind(combination, actionFunction):
 	if key in combination:
@@ -75,9 +104,24 @@ def on_release(key):
 	except KeyError:
 		pass
 	if key in COMBINATION and (not all(k in current for k in COMBINATION)):
-		commitMessage()
+		print("placeholder")
+		# commitMessage()
 	if key in DISCORDCOMBINATION and (not all(k in current for k in DISCORDCOMBINATION)):
-		commitDiscordMessage()
+		print("placeholder")
+		# commitDiscordMessage()
+	if key in START_ADVANCED_COMBINATION and (not all(k in current for k in START_ADVANCED_COMBINATION)):
+		commitAdvancedCommand()
+
+def commitAdvancedCommand():
+	global advancedCommandString
+	global commitCommand
+	commitCommand = True
+	if (advancedCommandString):
+		print("advanced command string final: " + advancedCommandString)
+
+
+	commitCommand = False
+
 
 def commitMessage():
 	global recordMessage
@@ -471,7 +515,6 @@ letters = {
 		"00100" +
 		"01110",
 }
-
 
 main()
 
