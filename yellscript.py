@@ -1,6 +1,9 @@
 from pynput.keyboard import Key, Controller, Listener, KeyCode, HotKey, GlobalHotKeys
+import os
 import time
 import subprocess
+from applescript import tell
+
 #Data
 keyboard = Controller()
 global MAC_ENVIRONMENT
@@ -12,7 +15,8 @@ global WINDOWS_ENVIRONMENT
 MAC_ENVIRONMENT = True
 WINDOWS_ENVIRONMENT = False
 
-ARGS_KEY_COMBINATION = '<cmd>+\\';
+ARGS_KEY_COMBINATION = '<cmd>+<shift>+<space>';
+START_ADVANCED_COMBINATION_SECOND_FORM = {Key.cmd_r, Key.shift, Key.space}
 # The key combination to check
 STOP_COMBINATION = {Key.shift, Key.esc}
 STOP_KEY_COMBINATION = '<shift>+<esc>'
@@ -56,17 +60,37 @@ def main():
     def on_activate_args():
         global args
         args = ""
+        global current
+        current = set()
         def args_on_press(key):
             global args
+            global current
+            current.add(key)
+
+            # Stop if start keys are pressed again
+            if key in START_ADVANCED_COMBINATION_SECOND_FORM:
+                        if all(k in current for k in START_ADVANCED_COMBINATION_SECOND_FORM):
+                            print("Exited Args Mode!")
+                            argsListener.stop()
+
+            # Execute any applicable commands
             if (key == Key.enter):
-                print("Sending Message: " + args)
-                args_function_map[args]()
+                print("Executing Args: " + args)
+                try:
+                    args_function_map[args]()
+                except KeyError:
+                    print("Error: No command found for: " + args)
+                print("Exited Args Mode!")
                 argsListener.stop()
-            args += str(key).replace('\'', '')
-            print("Main on press pressed: " + str(key))
+
+            # Recieve key input as arg mode parameters
+            if not key == Key.enter:
+                args += str(key).replace('\'', '')
+                print("Arg key added: " + str(key))
+
         def args_on_release(key):
-            print("Main on press released: " + str(key))
-        print("Main Entered!")
+            current.discard(key)
+        print("Entered Args Mode!")
         with Listener(
                 on_press=args_on_press,
                 on_release=args_on_release) as argsListener:
@@ -91,9 +115,17 @@ def maintest():
 def decrypt():
     subprocess.call(["/Users/collinquiasonrottinghaus/dev/cli-utils/build/install/cli-utils/bin/cli-utils", "-d", "$(pbpaste)"])
 
+def devpf():
+    tell.app( 'Terminal', 'do script "' + "kubectl --context=dev port-forward deploy/payit-proxy 27101" + '"')
+
+def typePass():
+    typeMessageWithInterval("Leandoer2001ILoveSuzuki!")
+
 args_function_map = {
     "test": maintest,
-    "de": decrypt
+    "de": decrypt,
+    "pa": typePass,
+    "devpf": devpf
 }
 
 
